@@ -1,22 +1,41 @@
 import random
 import time
 
+import thread
+import threading
+
 compass_heading = random.randint(0,360)
 
-user_reciprocal = input("What is the reciprocal of this compass heading?\n"+str(compass_heading)+"\n")
+prompt = "What is the reciprocal of this compass heading?\n"+str(compass_heading)+"\n"
 
-time.sleep(5)
+def raw_input_with_timeout(prompt, timeout=10.0):
+    timer = threading.Timer(timeout, thread.interrupt_main)
+    astring = None
+    try:
+        timer.start()
+        astring = raw_input(prompt)
+    except KeyboardInterrupt:
+        pass
+    timer.cancel()
+    if astring is None:
+	return -1
+    else:
+    	return astring
 
-answer = 0
+user_reciprocal = raw_input_with_timeout(prompt)
+
+answer = None
 
 if compass_heading < 180:
-#   global answer
     answer = compass_heading + 180
 else:
-#   global answer
     answer = compass_heading - 180
 
-if answer == user_reciprocal:
+if user_reciprocal == -1:
+    print("Time exceeded")
+
+if answer == int(user_reciprocal):
     print("Correct")
 else:
     print("Incorrect")
+    print("The answer is: "+str(answer))
